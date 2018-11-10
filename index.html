@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <canvas id="glCanvas" style="width: 800px; height: 600px"></canvas>
+
+        <!-- vertex shader -->
+    <script id="3d-vertex-shader" type="x-shader/x-vertex">
+        attribute vec4 a_position;
+        attribute vec2 a_texcoord;
+        
+        uniform mat4 u_matrix;
+        
+        varying vec2 v_texcoord;
+        
+        void main() {
+            // Multiply the position by the matrix.
+            gl_Position = u_matrix * a_position;
+            
+            // Pass the texcoord to the fragment shader.
+            v_texcoord = a_texcoord;
+        }
+    </script>
+    <!-- fragment shader -->
+    <script id="3d-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+        
+        // Passed in from the vertex shader.
+        varying vec2 v_texcoord;
+        
+        // The texture.
+        uniform sampler2D u_texture;
+        
+        void main() {
+            gl_FragColor = texture2D(u_texture, v_texcoord);
+            //gl_FragColor = vec4(100, 0, 0, 1);
+        }
+    </script>
+
+
+    <script id="3d-vertex-shader2" type="x-shader/x-vertex">
+        attribute vec4 a_position;
+        
+        varying vec2 v_texcoord;
+        
+        void main() {
+            gl_Position = a_position;
+            v_texcoord = (a_position.xy+vec2(1, 1))/2.0;
+        }
+    </script>
+    <!-- fragment shader -->
+    <script id="3d-fragment-shader2" type="x-shader/x-fragment">
+        precision mediump float;
+        
+        // Passed in from the vertex shader.
+        varying vec2 v_texcoord;
+        
+        // The texture.
+        uniform sampler2D u_texture;
+        
+        void main() {
+            vec4 c = texture2D(u_texture, v_texcoord);
+            /*if(c.y < 0.5){
+                gl_FragColor = c+vec4(0, 0.001, 0, 1);
+            }
+            else{
+                gl_FragColor = c;
+            }*/
+            vec2 tc = v_texcoord;
+            vec2 tdn = vec2(1.0/64.0, 0);
+            vec2 tde = vec2(0, 1.0/64.0);
+            int x = int(floor(v_texcoord.x*64.0));
+            int y = int(floor(v_texcoord.y*64.0));
+            vec4 up = texture2D(u_texture, tc+tdn);
+            vec4 down = texture2D(u_texture, tc-tdn);
+            vec4 left = texture2D(u_texture, tc+tde);
+            vec4 right = texture2D(u_texture, tc-tde);
+            gl_FragColor = (up+down+left+right+c)/5.0;
+            //gl_FragColor = vec4(float(x)/64.0, float(y)/64.0, 0.5, 1);
+        }
+    </script>
+    <!--
+    for most samples webgl-utils only provides shader compiling/linking and
+    canvas resizing because why clutter the examples with code that's the same in every sample.
+    See http://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+    and http://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+    for webgl-utils, m3, m4, and webgl-lessons-ui.
+    -->
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+    <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+    <script src="main.js"></script>
+    </body>
+</html>
