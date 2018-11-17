@@ -34,7 +34,7 @@
         uniform sampler2D u_texture;
         
         void main() {
-            gl_FragColor = texture2D(u_texture, v_texcoord);
+            gl_FragColor = vec4(texture2D(u_texture, v_texcoord).x, 0, 0, 1);
             //gl_FragColor = vec4(100, 0, 0, 1);
         }
     </script>
@@ -59,9 +59,44 @@
         
         // The texture.
         uniform sampler2D u_texture;
+
+        #define g   9.81
+        #define Manning 0.0
+        
+        vec4 G(vec4 Q){
+            return vec4(
+                Q.x*Q.z,
+                Q.x*Q.y*Q.z,
+                Q.x*pow(Q.z, 2.0)+0.5*g*pow(Q.x, 2.0),
+                0
+            );
+        }
+
+        vec4 F(vec4 Q){
+            return vec4(
+                Q.x*Q.y,
+                Q.x*pow(Q.y, 2.0)+0.5*g*pow(Q.x, 2.0),
+                Q.x*Q.y*Q.z,
+                0
+            );
+        }
+
+        vec4 Hf(vec4 Q, float Czs){
+            float s = -g*sqrt((Q.y*Q.y)+(Q.z*Q.z))/Czs;
+            return vec4(
+                0,
+                Q.y*s,
+                Q.z*s,
+                0
+            );
+        }
+
+        vec4 Hb(vec4 Q){
+            return vec4(0, 0, 0, 0);
+        }
         
         void main() {
-            vec4 c = texture2D(u_texture, v_texcoord);
+            vec4 Q = texture2D(u_texture, v_texcoord);
             /*if(c.y < 0.5){
                 gl_FragColor = c+vec4(0, 0.001, 0, 1);
             }
@@ -69,15 +104,26 @@
                 gl_FragColor = c;
             }*/
             vec2 tc = v_texcoord;
-            vec2 tdn = vec2(1.0/64.0, 0);
-            vec2 tde = vec2(0, 1.0/64.0);
-            int x = int(floor(v_texcoord.x*64.0));
-            int y = int(floor(v_texcoord.y*64.0));
-            vec4 up = texture2D(u_texture, tc+tdn);
-            vec4 down = texture2D(u_texture, tc-tdn);
-            vec4 left = texture2D(u_texture, tc+tde);
-            vec4 right = texture2D(u_texture, tc-tde);
-            gl_FragColor = (up+down+left+right+c)/5.0;
+            vec2 tdn = vec2(1.0/1024.0, 0);
+            vec2 tde = vec2(0, 1.0/1024.0);
+            int x = int(floor(v_texcoord.x*1024.0));
+            int y = int(floor(v_texcoord.y*1024.0));
+            vec4 Qu = texture2D(u_texture, tc+tdn);
+            vec4 Qd = texture2D(u_texture, tc-tdn);
+            vec4 Ql = texture2D(u_texture, tc+tde);
+            vec4 Qr = texture2D(u_texture, tc-tde);
+
+            float Cz = pow(Q.x, 0.1667)/Manning;
+            float Czs = Cz*Cz;
+
+            vec4 dQ = 
+                Hf(Q, Czs) 
+                + Hb(Q) 
+                - (F(Qu) - F(Qd)) 
+                - (G(Qr) - G(Ql));
+
+            gl_FragColor = Q + dQ*0.005;
+            //gl_FragColor = (up+down+left+right+c)/5.0;
             //gl_FragColor = vec4(float(x)/64.0, float(y)/64.0, 0.5, 1);
         }
     </script>

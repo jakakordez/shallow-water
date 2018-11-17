@@ -31,7 +31,7 @@ function main() {
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   // Put the positions in the buffer
-  setGeometry(gl);
+  setCanvas(gl);
 
   // Create a buffer for positions
   var positionBuffer2 = gl.createBuffer();
@@ -47,8 +47,8 @@ function main() {
   setTexcoords(gl);
 
   // Create a texture to render to
-  const targetTextureWidth = 64;
-  const targetTextureHeight = 64;
+  const targetTextureWidth = 1024;
+  const targetTextureHeight = 1024;
   const targetTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, targetTexture);
   {
@@ -146,7 +146,7 @@ function main() {
     gl.uniform1i(textureLocation, 0);
 
     // Draw the geometry.
-    gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
   // Draw the scene.
@@ -213,7 +213,7 @@ function main() {
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
       // Clear the canvas AND the depth buffer.
-      gl.clearColor(1, 1, 1, 1);   // clear to white
+      gl.clearColor(0.3, 0.8, 1, 1);   // clear to white
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
@@ -243,61 +243,12 @@ function getWater(size){
   for(var i = 0; i < size; i++){
     for(var j = 0; j < size; j++){
       var index = (j*size + i)*4;
-      water[index+0] = (i < size/2)?1:0;
+      water[index+0] = (i > size/3 && j > size/3 && i < 2*size/3 && j < 2*size/3)?1:0;
       water[index+3] = 1;
+      
     }
   }
   return water;
-}
-
-// Fill the buffer with the values that define a cube.
-function setGeometry(gl) {
-  var positions = new Float32Array(
-    [
-    -0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
-
-    -0.5, -0.5,   0.5,
-     0.5, -0.5,   0.5,
-    -0.5,  0.5,   0.5,
-    -0.5,  0.5,   0.5,
-     0.5, -0.5,   0.5,
-     0.5,  0.5,   0.5,
-
-    -0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
-
-    -0.5,  -0.5, -0.5,
-     0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,  -0.5,  0.5,
-     0.5,  -0.5, -0.5,
-     0.5,  -0.5,  0.5,
-
-    -0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5,  0.5,
-    -0.5,   0.5, -0.5,
-
-     0.5,  -0.5, -0.5,
-     0.5,   0.5, -0.5,
-     0.5,  -0.5,  0.5,
-     0.5,  -0.5,  0.5,
-     0.5,   0.5, -0.5,
-     0.5,   0.5,  0.5,
-
-    ]);
-  gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 }
 
 // Fill the buffer with texture coordinates the cube.
@@ -309,45 +260,9 @@ function setTexcoords(gl) {
           0, 0,
           0, 1,
           1, 0,
-          0, 1,
-          1, 1,
-          1, 0,
-
-          0, 0,
-          0, 1,
-          1, 0,
           1, 0,
           0, 1,
-          1, 1,
-
-          0, 0,
-          0, 1,
-          1, 0,
-          0, 1,
-          1, 1,
-          1, 0,
-
-          0, 0,
-          0, 1,
-          1, 0,
-          1, 0,
-          0, 1,
-          1, 1,
-
-          0, 0,
-          0, 1,
-          1, 0,
-          0, 1,
-          1, 1,
-          1, 0,
-
-          0, 0,
-          0, 1,
-          1, 0,
-          1, 0,
-          0, 1,
-          1, 1,
-
+          1, 1
       ]),
       gl.STATIC_DRAW);
 }
