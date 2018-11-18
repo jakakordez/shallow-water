@@ -14,13 +14,17 @@
         uniform mat4 u_matrix;
         
         varying vec2 v_texcoord;
+        varying vec4 v_position;
+
+        uniform sampler2D u_texture;
         
         void main() {
-            // Multiply the position by the matrix.
-            gl_Position = u_matrix * a_position;
+            v_texcoord = a_position.xz / 128.0;
+
+            v_position = a_position;
+            gl_Position = u_matrix * (a_position + vec4(0, texture2D(u_texture, v_texcoord).x, 0, 0));
             
-            // Pass the texcoord to the fragment shader.
-            v_texcoord = a_texcoord;
+            //v_texcoord = a_texcoord;
         }
     </script>
     <!-- fragment shader -->
@@ -29,13 +33,14 @@
         
         // Passed in from the vertex shader.
         varying vec2 v_texcoord;
+        varying vec4 v_position;
         
-        // The texture.
         uniform sampler2D u_texture;
         
         void main() {
             gl_FragColor = vec4(texture2D(u_texture, v_texcoord).x, 0, 0, 1);
-            //gl_FragColor = vec4(100, 0, 0, 1);
+            //gl_FragColor = vec4(0, 0, v_position.y, 1);
+             
         }
     </script>
 
@@ -104,10 +109,10 @@
                 gl_FragColor = c;
             }*/
             vec2 tc = v_texcoord;
-            vec2 tdn = vec2(1.0/1024.0, 0);
-            vec2 tde = vec2(0, 1.0/1024.0);
-            int x = int(floor(v_texcoord.x*1024.0));
-            int y = int(floor(v_texcoord.y*1024.0));
+            vec2 tdn = vec2(1.0/128.0, 0);
+            vec2 tde = vec2(0, 1.0/128.0);
+            int x = int(floor(v_texcoord.x*128.0));
+            int y = int(floor(v_texcoord.y*128.0));
             vec4 Qu = texture2D(u_texture, tc+tdn);
             vec4 Qd = texture2D(u_texture, tc-tdn);
             vec4 Ql = texture2D(u_texture, tc+tde);
