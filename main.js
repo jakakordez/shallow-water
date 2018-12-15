@@ -12,7 +12,7 @@ function main() {
   gl.getExtension('OES_texture_float_linear');
   gl.getExtension('OES_element_index_uint');
 
-  var waterSize = 128;
+  var waterSize = 32;
 
   // setup GLSL program
   var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
@@ -96,7 +96,7 @@ function main() {
     return d * Math.PI / 180;
   }
 
-  var fieldOfViewRadians = degToRad(80);
+  var fieldOfViewRadians = degToRad(60);
   var modelXRotationRadians = degToRad(0);
   var modelYRotationRadians = degToRad(0);
 
@@ -184,7 +184,7 @@ function main() {
 
     var cameraPosition = [-2, 10, -2];
     var up = [0, 1, 0];
-    var target = [40, 0, 40];
+    var target = [20, -5, 20];
 
     // Compute the camera's matrix using look at.
     var cameraMatrix = m4.lookAt(cameraPosition, target, up);
@@ -280,8 +280,10 @@ function main() {
       drawField(aspect);
     }
 
-    requestAnimationFrame(drawScene);
+    //requestAnimationFrame(drawScene);
   }
+
+  setInterval(drawScene, 100);
 }
 
 function setCanvas(gl){
@@ -338,11 +340,20 @@ function setFieldIndices(gl, size){
 
 function getWater(size){
   var water = new Float32Array(size * size * 4);
+  
   for(var i = 0; i < size; i++){
     for(var j = 0; j < size; j++){
       var index = (j*size + i)*4;
-      water[index+0] = (i > size/3 && j > size/3 && i < 2*size/3 && j < 2*size/3)?1:0;
-      water[index+3] = 1;
+      if(i > size/3 && j > size/3 && i < 2*size/3 && j < 2*size/3){
+        //water[index+0] = (Math.random()*0.75)+0.25;
+        water[index] = 2.0;
+      }
+      else water[index] = 0.1;
+      /*if(i == 10 && j == 10) water[index] = 5.0;
+      if(i == 10 && j == 11) water[index] = 5.0;
+      if(i == 11 && j == 10) water[index] = 5.0;
+      if(i == 11 && j == 11) water[index] = 5.0;*/
+      //water[index+3] = 1;
       
     }
   }
