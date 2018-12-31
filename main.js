@@ -1,6 +1,7 @@
 "use strict";
 
-function main() {
+function main(vs, fs) {
+
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   var canvas = document.getElementById("glCanvas");
@@ -16,7 +17,7 @@ function main() {
 
   // setup GLSL program
   var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
-  var program2 = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader2", "3d-fragment-shader2"]);
+  var program2 = webglUtils.createProgramFromSources(gl, [vs, fs]);
 
   // look up where the vertex data needs to go.
   var positionLocation = gl.getAttribLocation(program, "a_position");
@@ -376,4 +377,6 @@ function setTexcoords(gl) {
       gl.STATIC_DRAW);
 }
 
-main();
+Promise.all([axios.get('/swe1.vs.c'), axios.get('/swe1.fs.c')]).then(function(values) {
+  main(values[0].data, values[1].data);  
+});
