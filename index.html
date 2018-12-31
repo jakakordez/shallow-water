@@ -2,54 +2,49 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <title>Shallow water</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <style>
+            *{
+                background:black;
+                color:white;
+            }
+            body, html {
+               height: 100%;
+               overflow: hidden;
+            }
+            .col-10{
+                background:black;
+            }
+            canvas {
+                background-color: blue; 
+                width: 100%;
+                height: auto;
+            }
+        </style>
     </head>
-    <body>
-    <canvas id="glCanvas" style="width: 800px; height: 600px"></canvas>
-
-    <!-- vertex shader -->
-    <script id="3d-vertex-shader" type="x-shader/x-vertex">
-        attribute vec4 a_position;
-        attribute vec2 a_texcoord;
+    <body onresize="setSize()">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col-2">
+                    <h2>Shallow water</h2>
+                    <cite>Jaka Kordež</cite>
+                    <br />
+                    <button type="button" id="btnStart" class="btn btn-success">Start</button>
+                </div>
+                <div class="col-10">
+                    <canvas id="glCanvas" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
         
-        uniform mat4 u_matrix;
-        
-        varying vec2 v_texcoord;
-        varying vec4 v_position;
-
-        uniform sampler2D u_texture;
-        
-        void main() {
-            v_texcoord = a_position.xz / 128.0;
-
-            v_position = a_position;
-            gl_Position = u_matrix * (a_position + vec4(0, texture2D(u_texture, v_texcoord).x, 0, 0));
-            
-            //v_texcoord = a_texcoord;
-        }
-    </script>
-    <!-- fragment shader -->
-    <script id="3d-fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
-        
-        // Passed in from the vertex shader.
-        varying vec2 v_texcoord;
-        varying vec4 v_position;
-        
-        uniform sampler2D u_texture;
-        
-        void main() {
-            vec4 c = texture2D(u_texture, v_texcoord);
-            gl_FragColor = vec4(c.x, c.y, 0, 1);
-            //gl_FragColor = vec4(0, 0, v_position.y, 1);
-             
-        }
-    </script>
-
-    <!-- fragment shader -->
-    <script id="3d-fragment-shader2" type="x-shader/x-fragment" src='./swe1.js'></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
-    <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-    <script src="main.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+        <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+        <script src="main.js"></script>
     </body>
 </html>

@@ -1,10 +1,15 @@
 "use strict";
 
-function main(vs, fs) {
+function main(rvs, rfs, vs, fs) {
 
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   var canvas = document.getElementById("glCanvas");
+
+  var parent = canvas.parentElement;
+  console.log(parent)
+  
+
   var gl = canvas.getContext("webgl");
   if (!gl) {
     return;
@@ -16,7 +21,7 @@ function main(vs, fs) {
   var waterSize = 128;
 
   // setup GLSL program
-  var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
+  var program = webglUtils.createProgramFromSources(gl, [rvs, rfs]);
   var program2 = webglUtils.createProgramFromSources(gl, [vs, fs]);
 
   // look up where the vertex data needs to go.
@@ -210,6 +215,7 @@ function main(vs, fs) {
 
   // Draw the scene.
   function drawScene(time) {
+    setSize();
     // convert to seconds
     time *= 0.001;
     // Subtract the previous time from the current time
@@ -283,8 +289,10 @@ function main(vs, fs) {
 
     //requestAnimationFrame(drawScene);
   }
-
-  setInterval(drawScene, 30);
+  
+  $("#btnStart").on('click', function(){
+    setInterval(drawScene, 30);
+  });
 }
 
 function setCanvas(gl){
@@ -377,6 +385,20 @@ function setTexcoords(gl) {
       gl.STATIC_DRAW);
 }
 
-Promise.all([axios.get('/swe2.vs.c'), axios.get('/swe2.fs.c')]).then(function(values) {
-  main(values[0].data, values[1].data);  
+var promises = [
+  axios.get('/render.vs.c'),
+  axios.get('/render.fs.c'),
+  axios.get('/swe2.vs.c'),
+  axios.get('/swe2.fs.c')
+];
+
+Promise.all(promises).then(function(values) {
+  main(values[0].data, values[1].data, values[2].data, values[3].data);  
 });
+
+function setSize(){
+  var canvas = document.getElementById("glCanvas");
+  canvas.height = document.body.clientHeight;
+}
+
+
