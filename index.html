@@ -19,7 +19,7 @@
         uniform sampler2D u_texture;
         
         void main() {
-            v_texcoord = a_position.xz / 32.0;
+            v_texcoord = a_position.xz / 128.0;
 
             v_position = a_position;
             gl_Position = u_matrix * (a_position + vec4(0, texture2D(u_texture, v_texcoord).x, 0, 0));
@@ -44,7 +44,7 @@
              
         }
     </script>
-    
+
     <!-- fragment shader -->
     <script id="3d-fragment-shader2" type="x-shader/x-fragment" src='./swe1.js'></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

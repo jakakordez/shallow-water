@@ -13,7 +13,7 @@ function main(vs, fs) {
   gl.getExtension('OES_texture_float_linear');
   gl.getExtension('OES_element_index_uint');
 
-  var waterSize = 32;
+  var waterSize = 128;
 
   // setup GLSL program
   var program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
@@ -284,7 +284,7 @@ function main(vs, fs) {
     //requestAnimationFrame(drawScene);
   }
 
-  setInterval(drawScene, 100);
+  setInterval(drawScene, 30);
 }
 
 function setCanvas(gl){
@@ -377,6 +377,6 @@ function setTexcoords(gl) {
       gl.STATIC_DRAW);
 }
 
-Promise.all([axios.get('/swe1.vs.c'), axios.get('/swe1.fs.c')]).then(function(values) {
+Promise.all([axios.get('/swe2.vs.c'), axios.get('/swe2.fs.c')]).then(function(values) {
   main(values[0].data, values[1].data);  
 });

@@ -127,10 +127,10 @@ void main() {
         gl_FragColor = c;
     }*/
     vec2 tc = v_texcoord;
-    vec2 tdn = vec2(1.0/32.0, 0);
-    vec2 tde = vec2(0, 1.0/32.0);
-    int x = int(floor(v_texcoord.x*32.0));
-    int y = int(floor(v_texcoord.y*32.0));
+    vec2 tdn = vec2(1.0/128.0, 0);
+    vec2 tde = vec2(0, 1.0/128.0);
+    int x = int(floor(v_texcoord.x*128.0));
+    int y = int(floor(v_texcoord.y*128.0));
     vec4 Qu = texture2D(u_texture, tc+tdn);
     vec4 Qd = texture2D(u_texture, tc-tdn);
     vec4 Ql = texture2D(u_texture, tc+tde);
