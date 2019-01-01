@@ -17,8 +17,10 @@
             .col-10{
                 background:black;
             }
+            h1{
+                text-align: center;
+            }
             canvas {
-                background-color: blue; 
                 width: 100%;
                 height: auto;
             }
@@ -32,8 +34,13 @@
                     <cite>Jaka Kordež</cite>
                     <br />
                     <button type="button" id="btnStart" class="btn btn-success">Start</button>
+                    Draw time: <span id="lblDrawTime">-</span> ms
                 </div>
                 <div class="col-10">
+                    <h1 id="lblLoading">Loading...</h1>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                    </div>
                     <canvas id="glCanvas" width="300" height="300"></canvas>
                 </div>
             </div>
@@ -45,6 +52,10 @@
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
         <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+        <script src="framebuffer.js"></script>
+        <script src="field.js"></script>
+        <script src="elevation.js"></script>
+        <script src="water.js"></script>
         <script src="main.js"></script>
     </body>
 </html>

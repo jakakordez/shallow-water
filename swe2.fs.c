@@ -11,7 +11,7 @@ uniform sampler2D u_texture;
 #define u(Q)    (Q.y)
 #define v(Q)    (Q.z)
 
-#define df  128.0
+#define df  999.0
 #define idf 1.0/df
 #define dt  0.005
 #define H   100.0

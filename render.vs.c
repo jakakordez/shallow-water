@@ -9,7 +9,7 @@ varying vec4 v_position;
 uniform sampler2D u_texture;
 
 void main() {
-    v_texcoord = a_position.xz / 128.0;
+    v_texcoord = a_position.xz / 999.0;
 
     v_position = a_position;
     gl_Position = u_matrix * (a_position + vec4(0, texture2D(u_texture, v_texcoord).x, 0, 0));
