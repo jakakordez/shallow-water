@@ -14,8 +14,8 @@ uniform sampler2D elevationTexture;
 
 #define df  999.0
 #define idf 1.0/df
-#define dt  0.005
-#define H   100.0
+#define dt  0.1
+#define H   0.0
 
 #define tde vec2(idf, 0)
 #define tds vec2(0, idf)
@@ -31,23 +31,51 @@ bool WestEdge(float x){
 #define SouthEdge(y) (EastEdge(y))
 #define NorthEdge(y) (WestEdge(y))
 
+float GradU(vec2 tc){
+    int x = int(floor(tc.x*df));
+    int y = int(floor(tc.y*df));
+
+    vec2 etc = vec2(float(x) / 1000.0, float(y) / 1000.0);
+    etc = etc + vec2(0.5/1000.0, 0);
+    vec2 etce = etc + vec2(1.0/1000.0, 0);
+
+    vec4 E = texture2D(elevationTexture, etc);
+    vec4 Ee = texture2D(elevationTexture, etce);
+    return E.x - Ee.x;
+    //return 0.0;
+}
+
+float GradV(vec2 tc){
+    int x = int(floor(tc.x*df));
+    int y = int(floor(tc.y*df));
+
+    vec2 etc = vec2(float(x) / 1000.0, float(y) / 1000.0);
+    etc = etc + vec2(0, 0.5/1000.0);
+    vec2 etcs = etc + vec2(0, 1.0/1000.0);
+
+    vec4 E = texture2D(elevationTexture, etc);
+    vec4 Es = texture2D(elevationTexture, etcs);
+    return E.x - Es.x;
+    //return 0.1;
+}
+
 float u_np(vec2 tc, vec4 Q){
     if(EastEdge(tc.x)) return 0.0;
 
     vec4 Qe = texture2D(waterTexture, tc+tde);
-    return u(Q) - (g * dt * (h(Qe) - h(Q)));
+    return u(Q) - (g * dt * (h(Qe) - h(Q))) + (GradU(tc) * h(Q));
 }
 
 float v_np(vec2 tc, vec4 Q){
     if(SouthEdge(tc.y)) return 0.0;
 
     vec4 Qs = texture2D(waterTexture, tc+tds);
-    return v(Q) - (g * dt * (h(Qs) - h(Q)));
+    return v(Q) - (g * dt * (h(Qs) - h(Q))) + (GradV(tc) * h(Q));
 }
 
 void main() {
-    vec4 Q = texture2D(waterTexture, v_texcoord);
     vec2 tc = v_texcoord;
+    vec4 Q = texture2D(waterTexture, tc);
     //int x = int(floor(tc.x*128.0));
     //int y = int(floor(tc.y*128.0));
     vec4 Qs = texture2D(waterTexture, tc+tds);

@@ -156,6 +156,7 @@ void main() {
         nQ.y /= h(nQ);
         nQ.z /= h(nQ);
     }
+
     gl_FragColor = nQ;
     //gl_FragColor = (up+down+left+right+c)/5.0;
     //gl_FragColor = vec4(float(x)/64.0, float(y)/64.0, 0.5, 1);

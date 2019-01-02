@@ -8,7 +8,7 @@ function loadElevationFile(size){
             var miny = 10000000;
             var lines = d.data.split('\n');
             var points = [];
-            lines.forEach(function(l) {
+            /*lines.forEach(function(l) {
                 var value = l.split(';');
                 var r = {
                     x: parseInt(value[0]),
@@ -22,7 +22,14 @@ function loadElevationFile(size){
             points.forEach(function(p) {
                 var index = (p.x - minx) * size + (p.y - miny);
                 topography[index] = p.h;
-            });
+            });*/
+
+            for(var i = 0; i < size; i++){
+                for(var j = 0; j < size; j++){
+                    var index = i*size + j;
+                    topography[index] = i*0.3;
+                }
+            }
 
             console.log("Finished with elevation")
             resolve(topography);        

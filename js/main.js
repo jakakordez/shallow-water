@@ -139,10 +139,7 @@ function main(promises) {
 
     {
       // render to our targetTexture by binding the framebuffer
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-
-      // render cube with our 3x2 texture
-      gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);      
 
       // Tell WebGL how to convert from clip space to pixels
       gl.viewport(0, 0, waterSize, waterSize);
@@ -165,6 +162,11 @@ function main(promises) {
       // Tell the shader to use texture unit 0 for u_texture
       gl.uniform1i(sWaterTexLocation, 0);
       gl.uniform1i(sElevationTexLocation, 1);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, elevationTexture);
 
       // Draw the geometry.
       gl.drawArrays(gl.TRIANGLES, 0, 6);

@@ -14,10 +14,9 @@ void main() {
     v_position = a_position;
     float asl = texture2D(elevationTexture, v_texcoord).x;
     float waterLevel = texture2D(waterTexture, v_texcoord).x;
-    waterLevel -= 0.12;
-    /*if(waterLevel < 0.01){
-        
-    }*/
+    if(waterLevel < 0.01){
+        waterLevel = 0.0/0.0;
+    }
     gl_Position = u_matrix * (a_position + vec4(0, asl + waterLevel, 0, 0));
     
 }
