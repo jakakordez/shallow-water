@@ -9,7 +9,6 @@ function setFieldVertices(gl, size){
         field[index+2] = j;
       }
     }
-    console.log(field);
     var buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, field, gl.STATIC_DRAW);
@@ -31,7 +30,6 @@ function setFieldIndices(gl, size){
         indices[index+5] = (pts*(j+1))+i+1;
       }
     }
-    console.log(indices);
     var buf = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);

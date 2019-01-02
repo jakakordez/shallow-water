@@ -2,11 +2,13 @@
 
 function main(promises) {
 
-  var rvs = promises[0].data;
-  var rfs = promises[1].data;
-  var vs = promises[2].data;
-  var fs = promises[3].data;
-  var elevationData = promises[4].data;
+  var wvs = promises[0].data;
+  var wfs = promises[1].data;
+  var evs = promises[2].data;
+  var efs = promises[3].data;
+  var vs = promises[4].data;
+  var fs = promises[5].data;
+  var elevationData = promises[6];
 
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
@@ -22,20 +24,23 @@ function main(promises) {
   var waterSize = 999;
 
   // setup GLSL program
-  var program = webglUtils.createProgramFromSources(gl, [rvs, rfs]);
-  var program2 = webglUtils.createProgramFromSources(gl, [vs, fs]);
+  var waterProgram = webglUtils.createProgramFromSources(gl, [wvs, wfs]);
+  var elevationProgram = webglUtils.createProgramFromSources(gl, [evs, efs]);
+  var sweProgram = webglUtils.createProgramFromSources(gl, [vs, fs]);
 
-  // look up where the vertex data needs to go.
-  var positionLocation = gl.getAttribLocation(program, "a_position");
-  var texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
+  var wPositionLocation = gl.getAttribLocation(waterProgram, "a_position");
+  var wMatrixLocation = gl.getUniformLocation(waterProgram, "u_matrix");
+  var wWaterTexLocation = gl.getUniformLocation(waterProgram, "waterTexture");
+  var wElevationTexLocation = gl.getUniformLocation(waterProgram, "elevationTexture");
+  
+  var ePositionLocation = gl.getAttribLocation(elevationProgram, "a_position");
+  var eMatrixLocation = gl.getUniformLocation(elevationProgram, "u_matrix");
+  var eElevationTexLocation = gl.getUniformLocation(elevationProgram, "elevationTexture");
 
-  // lookup uniforms
-  var matrixLocation = gl.getUniformLocation(program, "u_matrix");
-  var textureLocation = gl.getUniformLocation(program, "u_texture");
-
-  var positionLocation2 = gl.getAttribLocation(program2, "a_position");
-  var textureLocation2 = gl.getUniformLocation(program2, "u_texture");
-
+  var sPositionLocation = gl.getAttribLocation(sweProgram, "a_position");
+  var sWaterTexLocation = gl.getUniformLocation(sweProgram, "waterTexture");
+  var sElevationTexLocation = gl.getUniformLocation(sweProgram, "elevationTexture");
+  
   // Create a buffer for positions
   var positionBuffer = gl.createBuffer();
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
@@ -64,7 +69,7 @@ function main(promises) {
 
   const targetTexture = getTargetTexture(gl, waterSize);
   const waterTexture = getWaterTexture(gl, waterSize);
-  const elevationTexture = getElevationTexture(gl, waterSize-1, elevationData)
+  const elevationTexture = getElevationTexture(gl, waterSize+1, elevationData)
 
   // Create and bind the framebuffer
   const fb = gl.createFramebuffer();
@@ -80,75 +85,42 @@ function main(promises) {
   }
 
   var fieldOfViewRadians = degToRad(60);
-  var modelXRotationRadians = degToRad(0);
-  var modelYRotationRadians = degToRad(0);
 
-  function drawCube(aspect) {
-    // Tell it to use our program (pair of shaders)
-    gl.useProgram(program);
+  function drawWater(matrix, size) {
+    gl.useProgram(waterProgram); // Tell it to use our program (pair of shaders)
+    gl.enableVertexAttribArray(wPositionLocation); // Turn on the position attribute
+    gl.bindBuffer(gl.ARRAY_BUFFER, waterVertices); // Bind the position buffer.
+    gl.vertexAttribPointer(wPositionLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, waterIndices);
 
-    // Turn on the position attribute
-    gl.enableVertexAttribArray(positionLocation);
-
-    // Bind the position buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-
-    // Turn on the teccord attribute
-    gl.enableVertexAttribArray(texcoordLocation);
-
-    // Bind the position buffer.
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-
-    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
-
-    // Compute the projection matrix
-    var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
-
-    var cameraPosition = [0, 0, 2];
-    var up = [0, 1, 0];
-    var target = [0, 0, 0];
-
-    // Compute the camera's matrix using look at.
-    var cameraMatrix = m4.lookAt(cameraPosition, target, up);
-
-    // Make a view matrix from the camera matrix.
-    var viewMatrix = m4.inverse(cameraMatrix);
-
-    var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
-
-    var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
-    matrix = m4.yRotate(matrix, modelYRotationRadians);
-
-    // Set the matrix.
-    gl.uniformMatrix4fv(matrixLocation, false, matrix);
+    gl.uniformMatrix4fv(wMatrixLocation, false, matrix); // Set the matrix.
 
     // Tell the shader to use texture unit 0 for u_texture
-    gl.uniform1i(textureLocation, 0);
+    gl.uniform1i(wWaterTexLocation, 0);
+    gl.uniform1i(wElevationTexLocation, 1);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, waterTexture);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, elevationTexture);
 
     // Draw the geometry.
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawElements(gl.TRIANGLES, size*size*6, gl.UNSIGNED_INT, 0);
   }
 
-  function drawField(matrix, size, vertices, indices) {
-    gl.useProgram(program); // Tell it to use our program (pair of shaders)
-    gl.enableVertexAttribArray(positionLocation); // Turn on the position attribute
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertices); // Bind the position buffer.
-    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indices);
-    
-    //gl.enableVertexAttribArray(texcoordLocation); // Turn on the teccord attribute
-    //gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer); // Bind the position buffer.
-    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    //gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
+  function drawElevation(matrix, size) {
+    gl.useProgram(elevationProgram); // Tell it to use our program (pair of shaders)
+    gl.enableVertexAttribArray(ePositionLocation); // Turn on the position attribute
+    gl.bindBuffer(gl.ARRAY_BUFFER, elevationVertices); // Bind the position buffer.
+    gl.vertexAttribPointer(ePositionLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elevationIndices);
 
-    gl.uniformMatrix4fv(matrixLocation, false, matrix); // Set the matrix.
+    gl.uniformMatrix4fv(eMatrixLocation, false, matrix); // Set the matrix.
 
-    // Tell the shader to use texture unit 0 for u_texture
-    gl.uniform1i(textureLocation, 0);
+    gl.uniform1i(eElevationTexLocation, 0);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, elevationTexture);
 
     // Draw the geometry.
     gl.drawElements(gl.TRIANGLES, size*size*6, gl.UNSIGNED_INT, 0);
@@ -162,7 +134,7 @@ function main(promises) {
 
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
-    gl.enable(gl.CULL_FACE);
+    //gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
     {
@@ -176,22 +148,23 @@ function main(promises) {
       gl.viewport(0, 0, waterSize, waterSize);
 
       // Clear the canvas AND the depth buffer.
-      gl.clearColor(0, 0, 1, 1);   // clear to blue
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      //gl.clearColor(0, 0, 1, 1);   // clear to blue
+      //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-      gl.useProgram(program2);
+      gl.useProgram(sweProgram);
 
         // Turn on the position attribute
-      gl.enableVertexAttribArray(positionLocation2);
+      gl.enableVertexAttribArray(sPositionLocation);
 
       // Bind the position buffer.
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer2);
 
       // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-      gl.vertexAttribPointer(positionLocation2, 3, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(sPositionLocation, 3, gl.FLOAT, false, 0, 0);
 
       // Tell the shader to use texture unit 0 for u_texture
-      gl.uniform1i(textureLocation2, 0);
+      gl.uniform1i(sWaterTexLocation, 0);
+      gl.uniform1i(sElevationTexLocation, 1);
 
       // Draw the geometry.
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -204,9 +177,6 @@ function main(promises) {
       // render to the canvas
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-      // render the cube with the texture we just rendered to
-      gl.bindTexture(gl.TEXTURE_2D, waterTexture);
-
       // Tell WebGL how to convert from clip space to pixels
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -218,9 +188,9 @@ function main(promises) {
       // Compute the projection matrix
       var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-      var cameraPosition = [-2, 10, -2];
+      var cameraPosition = [-2, 600, -2];
       var up = [0, 1, 0];
-      var target = [20, -5, 20];
+      var target = [200, 500, 200];
 
       // Compute the camera's matrix using look at.
       var cameraMatrix = m4.lookAt(cameraPosition, target, up);
@@ -230,12 +200,8 @@ function main(promises) {
 
       var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-      var matrix = m4.xRotate(viewProjectionMatrix, modelXRotationRadians);
-      matrix = m4.yRotate(matrix, modelYRotationRadians);
-
-      //drawCudrawCube(aspect);
-      drawField(matrix, waterSize, waterVertices, waterIndices);
-      drawField(matrix, waterSize+1, elevationVertices, elevationIndices);
+      drawWater(viewProjectionMatrix, waterSize);
+      drawElevation(viewProjectionMatrix, waterSize+1);
     }
 
     //requestAnimationFrame(drawScene);
@@ -282,10 +248,12 @@ function setTexcoords(gl) {
 }
 
 var promises = [
-  axios.get('render.vs.c'),
-  axios.get('render.fs.c'),
-  axios.get('swe2.vs.c'),
-  axios.get('swe2.fs.c'),
+  axios.get('shaders/water.vs.c'),
+  axios.get('shaders/water.fs.c'),
+  axios.get('shaders/elevation.vs.c'),
+  axios.get('shaders/elevation.fs.c'),
+  axios.get('shaders/swe2.vs.c'),
+  axios.get('shaders/swe2.fs.c'),
   loadElevationFile(1000)
 ];
 

@@ -4,7 +4,8 @@ precision mediump float;
 varying vec2 v_texcoord;
 
 // The texture.
-uniform sampler2D u_texture;
+uniform sampler2D waterTexture;
+uniform sampler2D elevationTexture;
 
 #define max(x, y)  ((x > y)?(x):(y))
 #define min(x, y)  ((x > y)?(y):(x))
@@ -119,7 +120,7 @@ vec4 R(vec4 Q, vec4 Qu, vec4 Qd, vec4 Qr, vec4 Ql){
 }
 
 void main() {
-    vec4 Q = texture2D(u_texture, v_texcoord);
+    vec4 Q = texture2D(waterTexture, v_texcoord);
     /*if(c.y < 0.5){
         gl_FragColor = c+vec4(0, 0.001, 0, 1);
     }
@@ -131,10 +132,10 @@ void main() {
     vec2 tde = vec2(0, 1.0/128.0);
     int x = int(floor(v_texcoord.x*128.0));
     int y = int(floor(v_texcoord.y*128.0));
-    vec4 Qu = texture2D(u_texture, tc+tdn);
-    vec4 Qd = texture2D(u_texture, tc-tdn);
-    vec4 Ql = texture2D(u_texture, tc+tde);
-    vec4 Qr = texture2D(u_texture, tc-tde);
+    vec4 Qu = texture2D(waterTexture, tc+tdn);
+    vec4 Qd = texture2D(waterTexture, tc-tdn);
+    vec4 Ql = texture2D(waterTexture, tc+tde);
+    vec4 Qr = texture2D(waterTexture, tc-tde);
 
     float Cz = pow(Q.x, 0.1667)/Manning;
     float Czs = Cz*Cz;

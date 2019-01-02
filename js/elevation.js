@@ -2,16 +2,28 @@
 function loadElevationFile(size){
     console.log("Started loading elevation");
     var promise = new Promise(function(resolve, reject) {
-        axios.get('/GK1_435_133.asc').then(function(d){
+        axios.get('GK1_435_133.asc').then(function(d){
             var topography = new Float32Array(size * size);
+            var minx = 10000000;
+            var miny = 10000000;
             var lines = d.data.split('\n');
-            for(var i = 0; i < size; i++){
-                for(var j = 0; j < size; j++){
-                    var index = j*size + i;
-                    var value = parseFloat(lines[index].split(';')[2]);
-                    topography[index] = value;            
-                }
-            }
+            var points = [];
+            lines.forEach(function(l) {
+                var value = l.split(';');
+                var r = {
+                    x: parseInt(value[0]),
+                    y: parseInt(value[1]),
+                    h: parseFloat(value[2])
+                }; 
+                if(r.x < minx) minx = r.x;
+                if(r.y < miny) miny = r.y;
+                points.push(r);
+            });
+            points.forEach(function(p) {
+                var index = (p.x - minx) * size + (p.y - miny);
+                topography[index] = p.h;
+            });
+
             console.log("Finished with elevation")
             resolve(topography);        
         });
@@ -23,9 +35,9 @@ function getElevationTexture(gl, size, elevationData){
     var tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE,
                     size, size, 0,
-                    gl.RGBA, gl.FLOAT, elevationData);
+                    gl.LUMINANCE, gl.FLOAT, elevationData);
     
         // set the filtering so we don't need mips
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

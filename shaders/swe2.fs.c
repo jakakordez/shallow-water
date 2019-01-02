@@ -3,7 +3,8 @@ precision mediump float;
 // Passed in from the vertex shader.
 varying vec2 v_texcoord;
 
-uniform sampler2D u_texture;
+uniform sampler2D waterTexture;
+uniform sampler2D elevationTexture;
 
 #define g   9.81
 
@@ -33,26 +34,26 @@ bool WestEdge(float x){
 float u_np(vec2 tc, vec4 Q){
     if(EastEdge(tc.x)) return 0.0;
 
-    vec4 Qe = texture2D(u_texture, tc+tde);
+    vec4 Qe = texture2D(waterTexture, tc+tde);
     return u(Q) - (g * dt * (h(Qe) - h(Q)));
 }
 
 float v_np(vec2 tc, vec4 Q){
     if(SouthEdge(tc.y)) return 0.0;
 
-    vec4 Qs = texture2D(u_texture, tc+tds);
+    vec4 Qs = texture2D(waterTexture, tc+tds);
     return v(Q) - (g * dt * (h(Qs) - h(Q)));
 }
 
 void main() {
-    vec4 Q = texture2D(u_texture, v_texcoord);
+    vec4 Q = texture2D(waterTexture, v_texcoord);
     vec2 tc = v_texcoord;
     //int x = int(floor(tc.x*128.0));
     //int y = int(floor(tc.y*128.0));
-    vec4 Qs = texture2D(u_texture, tc+tds);
-    vec4 Qn = texture2D(u_texture, tc-tds);
-    vec4 Qe = texture2D(u_texture, tc+tde);
-    vec4 Qw = texture2D(u_texture, tc-tde);
+    vec4 Qs = texture2D(waterTexture, tc+tds);
+    vec4 Qn = texture2D(waterTexture, tc-tds);
+    vec4 Qe = texture2D(waterTexture, tc+tde);
+    vec4 Qw = texture2D(waterTexture, tc-tde);
 
     float u_np1 = u_np(tc, Q);
     float v_np1 = v_np(tc, Q);

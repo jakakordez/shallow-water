@@ -18,6 +18,7 @@ function getWater(size){
             
         }
     }
+    console.log(water);
     return water;
 }
 
