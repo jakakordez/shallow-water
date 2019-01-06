@@ -149,6 +149,7 @@ function main(promises) {
 
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
+    
 
     for(var ite = 0; ite < steps; ite++) {
       
@@ -222,8 +223,11 @@ function main(promises) {
 
       var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-      drawWater(viewProjectionMatrix, waterSize);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       drawElevation(viewProjectionMatrix, waterSize+1);
+      drawWater(viewProjectionMatrix, waterSize);
+      gl.disable(gl.BLEND);
     }
 
     //requestAnimationFrame(drawScene);
