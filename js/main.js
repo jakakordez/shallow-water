@@ -138,9 +138,18 @@ function main(promises) {
 
   var steps = 30;
   var rain = 0;
+  var pressed={};
+  var position = [250, 600, 250];
 
   // Draw the scene.
   function drawScene(time) {
+    if(pressed.forward) position[0] += 1;
+    else if(pressed.backward) position[0] -= 1;
+    if(pressed.left) position[2] += 1;
+    else if(pressed.right) position[2] -= 1;
+    if(pressed.up) position[1] += 1;
+    else if(pressed.down) position[1] -= 1;
+
     var t0 = performance.now();
 
     setSize();
@@ -149,7 +158,6 @@ function main(promises) {
 
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
-    
 
     for(var ite = 0; ite < steps; ite++) {
       
@@ -211,9 +219,9 @@ function main(promises) {
       // Compute the projection matrix
       var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-      var cameraPosition = [250, 600, 250];
+      var cameraPosition = position;
       var up = [0, 1, 0];
-      var target = [400, 500, 400];
+      var target = [waterSize/2, 400, waterSize/2];
 
       // Compute the camera's matrix using look at.
       var cameraMatrix = m4.lookAt(cameraPosition, target, up);
@@ -259,6 +267,32 @@ function main(promises) {
   });
 
   $("#lblLoading,.progress").remove();
+
+  
+  document.onkeydown=function(e){
+      e = e || window.event;
+      switch(e.keyCode){
+        case 87: pressed.forward = true; break;
+        case 83: pressed.backward = true; break;
+        case 65: pressed.left = true; break;
+        case 68: pressed.right = true; break;
+        case 81: pressed.up = true; break;
+        case 69: pressed.down = true; break;
+      }
+  }
+
+  document.onkeyup=function(e){
+      e = e || window.event;
+      switch(e.keyCode){
+        case 87: pressed.forward = false; break;
+        case 83: pressed.backward = false; break;
+        case 65: pressed.left = false; break;
+        case 68: pressed.right = false; break;
+        case 81: pressed.up = false; break;
+        case 69: pressed.down = false; break;
+      }
+  }
+  
 
   console.log("Initialized");
 }

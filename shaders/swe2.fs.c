@@ -33,34 +33,6 @@ bool WestEdge(float x){
 #define SouthEdge(y) (EastEdge(y))
 #define NorthEdge(y) (WestEdge(y))
 
-float GradU(vec2 tc){
-    int x = int(floor(tc.x*df));
-    int y = int(floor(tc.y*df));
-
-    vec2 etc = vec2(float(x) / 1000.0, float(y) / 1000.0);
-    etc = etc + vec2(0.5/1000.0, 0);
-    vec2 etce = etc + vec2(1.0/1000.0, 0);
-
-    vec4 E = texture2D(elevationTexture, etc);
-    vec4 Ee = texture2D(elevationTexture, etce);
-    return E.x - Ee.x;
-    //return 0.0;
-}
-
-float GradV(vec2 tc){
-    int x = int(floor(tc.x*df));
-    int y = int(floor(tc.y*df));
-
-    vec2 etc = vec2(float(x) / 1000.0, float(y) / 1000.0);
-    etc = etc + vec2(0, 0.5/1000.0);
-    vec2 etcs = etc + vec2(0, 1.0/1000.0);
-
-    vec4 E = texture2D(elevationTexture, etc);
-    vec4 Es = texture2D(elevationTexture, etcs);
-    return E.x - Es.x;
-    //return 0.1;
-}
-
 float Height(vec2 tc){
     int x = int(floor(tc.x*df));
     int y = int(floor(tc.y*df));
@@ -74,22 +46,14 @@ float u_np(vec2 tc, vec4 Q){
     if(EastEdge(tc.x)) return 0.0;
 
     vec4 Qe = texture2D(waterTexture, tc+tde);
-    return u(Q) - (g * dt * ((h(Qe) + Height(tc + tde)) - (h(Q) + Height(tc))));// + (GradU(tc) * h(Q));
+    return u(Q) - (g * dt * ((h(Qe) + Height(tc + tde)) - (h(Q) + Height(tc))));
 }
 
 float v_np(vec2 tc, vec4 Q){
     if(SouthEdge(tc.y)) return 0.0;
 
     vec4 Qs = texture2D(waterTexture, tc+tds);
-    return v(Q) - (g * dt * ((h(Qs) + Height(tc + tds)) - (h(Q) + Height(tc))));// + (GradV(tc) * h(Q));
-}
-
-bool isnan( float val )
-{
-  return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true;
-  // important: some nVidias failed to cope with version below.
-  // Probably wrong optimization.
-  /*return ( val <= 0.0 || 0.0 <= val ) ? false : true;*/
+    return v(Q) - (g * dt * ((h(Qs) + Height(tc + tds)) - (h(Q) + Height(tc))));
 }
 
 void main() {
@@ -136,11 +100,16 @@ void main() {
         v_np1,
         0
     );
-    if(isnan(nQ.x) || nQ.x > 100.0) nQ.x = 0.0;
-    if(isnan(nQ.y) || nQ.y > 100.0) nQ.y = 0.0;
-    if(isnan(nQ.z) || nQ.z > 100.0) nQ.z = 0.0;
+
+    if(h(nQ) < 0.01){
+        float de = sqrt(2.0)*h(nQ)*h(nQ)/sqrt(h(nQ)*h(nQ)*h(nQ)*h(nQ) + 0.1);
+        nQ.y = de*u(nQ);
+        nQ.z = de*v(nQ);
+    }
+
     if(tc.x > 0.4 && tc.y > 0.4 && tc.x < 0.6 && tc.y < 0.6){
         nQ.x += rain;
     }
+
     gl_FragColor = nQ;
 }
