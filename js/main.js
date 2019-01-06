@@ -14,14 +14,17 @@ function main(promises) {
   /** @type {HTMLCanvasElement} */
   var canvas = document.getElementById("glCanvas");
 
-  var gl = canvas.getContext("webgl");
+  var gl = canvas.getContext("webgl2");//webgl
   if (!gl) return;
+
+  var waterSize = 999;
 
   gl.getExtension('OES_texture_float');
   gl.getExtension('OES_texture_float_linear');
   gl.getExtension('OES_element_index_uint');
 
-  var waterSize = 999;
+  gl.getExtension('EXT_color_buffer_float');
+  gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGB32F, waterSize+1, waterSize+1);
 
   // setup GLSL program
   var waterProgram = webglUtils.createProgramFromSources(gl, [wvs, wfs]);
@@ -134,10 +137,10 @@ function main(promises) {
 
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
-    //gl.enable(gl.CULL_FACE);
+    gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
-    {
+    for(var ite = 0; ite < 5; ite++) {
       // render to our targetTexture by binding the framebuffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);      
 
@@ -190,9 +193,9 @@ function main(promises) {
       // Compute the projection matrix
       var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-      var cameraPosition = [-2, 600, -2];
+      var cameraPosition = [250, 600, 250];
       var up = [0, 1, 0];
-      var target = [200, 500, 200];
+      var target = [400, 500, 400];
 
       // Compute the camera's matrix using look at.
       var cameraMatrix = m4.lookAt(cameraPosition, target, up);
@@ -212,7 +215,7 @@ function main(promises) {
   }
 
   $("#btnStart").on('click', function(){
-    setInterval(drawScene, 30);
+    setInterval(drawScene, 3);
   });
 
   $("#lblLoading,.progress").remove();

@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 
 // Passed in from the vertex shader.
 varying vec2 v_texcoord;
@@ -14,7 +14,7 @@ uniform sampler2D elevationTexture;
 
 #define df  999.0
 #define idf 1.0/df
-#define dt  0.1
+#define dt  0.001
 #define H   0.0
 
 #define tde vec2(idf, 0)
@@ -59,18 +59,35 @@ float GradV(vec2 tc){
     //return 0.1;
 }
 
+float Height(vec2 tc){
+    int x = int(floor(tc.x*df));
+    int y = int(floor(tc.y*df));
+
+    vec2 etc = vec2(float(x) / 1000.0, float(y) / 1000.0);
+
+    return texture2D(elevationTexture, etc).x;
+}
+
 float u_np(vec2 tc, vec4 Q){
     if(EastEdge(tc.x)) return 0.0;
 
     vec4 Qe = texture2D(waterTexture, tc+tde);
-    return u(Q) - (g * dt * (h(Qe) - h(Q))) + (GradU(tc) * h(Q));
+    return u(Q) - (g * dt * ((h(Qe) + Height(tc + tde)) - (h(Q) + Height(tc))));// + (GradU(tc) * h(Q));
 }
 
 float v_np(vec2 tc, vec4 Q){
     if(SouthEdge(tc.y)) return 0.0;
 
     vec4 Qs = texture2D(waterTexture, tc+tds);
-    return v(Q) - (g * dt * (h(Qs) - h(Q))) + (GradV(tc) * h(Q));
+    return v(Q) - (g * dt * ((h(Qs) + Height(tc + tds)) - (h(Q) + Height(tc))));// + (GradV(tc) * h(Q));
+}
+
+bool isnan( float val )
+{
+  return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true;
+  // important: some nVidias failed to cope with version below.
+  // Probably wrong optimization.
+  /*return ( val <= 0.0 || 0.0 <= val ) ? false : true;*/
 }
 
 void main() {
@@ -117,6 +134,8 @@ void main() {
         v_np1,
         0
     );
-
+    if(isnan(nQ.x) || nQ.x > 100.0) nQ.x = 0.0;
+    if(isnan(nQ.y) || nQ.y > 100.0) nQ.y = 0.0;
+    if(isnan(nQ.z) || nQ.z > 100.0) nQ.z = 0.0;
     gl_FragColor = nQ;
 }

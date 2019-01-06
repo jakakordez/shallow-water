@@ -4,7 +4,7 @@ function getTargetTexture(gl, size){
   const targetTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, targetTexture);
   {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F,
                   size, size, 0,
                   gl.RGBA, gl.FLOAT, null);
 
