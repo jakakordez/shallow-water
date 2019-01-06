@@ -7,7 +7,7 @@ function getWater(size){
             var index = (j*size + i)*4;
             if(i > size/3 && j > size/3 && i < 2*size/3 && j < 2*size/3){
                 //water[index+0] = (Math.random()*0.75)+0.25;
-                water[index] = 0.3;
+                //water[index] = 0.3;
             }
             /*if(i == 10 && j == 10) water[index] = 5.0;
             if(i == 10 && j == 11) water[index] = 5.0;
@@ -16,7 +16,6 @@ function getWater(size){
             //water[index+3] = 1;
         }
     }
-    console.log(water);
     return water;
 }
 

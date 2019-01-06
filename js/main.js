@@ -9,6 +9,7 @@ function main(promises) {
   var vs = promises[4].data;
   var fs = promises[5].data;
   var elevationData = promises[6];
+  var ortophoto = promises[7];
 
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
@@ -39,9 +40,11 @@ function main(promises) {
   var ePositionLocation = gl.getAttribLocation(elevationProgram, "a_position");
   var eMatrixLocation = gl.getUniformLocation(elevationProgram, "u_matrix");
   var eElevationTexLocation = gl.getUniformLocation(elevationProgram, "elevationTexture");
+  var eOrtophotoTexLocation = gl.getUniformLocation(elevationProgram, "ortophotoTexture");
 
   var sPositionLocation = gl.getAttribLocation(sweProgram, "a_position");
   var sWaterTexLocation = gl.getUniformLocation(sweProgram, "waterTexture");
+  var sRainLocation = gl.getUniformLocation(sweProgram, "rain");
   var sElevationTexLocation = gl.getUniformLocation(sweProgram, "elevationTexture");
   
   // Create a buffer for positions
@@ -73,6 +76,7 @@ function main(promises) {
   const targetTexture = getTargetTexture(gl, waterSize);
   const waterTexture = getWaterTexture(gl, waterSize);
   const elevationTexture = getElevationTexture(gl, waterSize+1, elevationData)
+  const ortophotoTexture = getOrtophotoTexture(gl, URL.createObjectURL(ortophoto.data));
 
   // Create and bind the framebuffer
   const fb = gl.createFramebuffer();
@@ -121,13 +125,19 @@ function main(promises) {
     gl.uniformMatrix4fv(eMatrixLocation, false, matrix); // Set the matrix.
 
     gl.uniform1i(eElevationTexLocation, 0);
+    gl.uniform1i(eOrtophotoTexLocation, 1);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, elevationTexture);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, ortophotoTexture);
 
     // Draw the geometry.
     gl.drawElements(gl.TRIANGLES, size*size*6, gl.UNSIGNED_INT, 0);
   }
+
+  var steps = 30;
+  var rain = 0;
 
   // Draw the scene.
   function drawScene(time) {
@@ -140,7 +150,9 @@ function main(promises) {
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
-    for(var ite = 0; ite < 5; ite++) {
+    for(var ite = 0; ite < steps; ite++) {
+      
+      
       // render to our targetTexture by binding the framebuffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);      
 
@@ -170,6 +182,11 @@ function main(promises) {
       gl.bindTexture(gl.TEXTURE_2D, waterTexture);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, elevationTexture);
+
+      if(ite == 0){
+        gl.uniform1f(sRainLocation, rain * 0.001);
+      }
+      else gl.uniform1f(sRainLocation, 0.0);
 
       // Draw the geometry.
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -214,8 +231,27 @@ function main(promises) {
     $("#lblDrawTime").text(t1-t0);
   }
 
+  var timer = null;
   $("#btnStart").on('click', function(){
-    setInterval(drawScene, 3);
+    if(timer){
+      clearInterval(timer);
+      timer = null;
+      $(this).text("Start");
+    }
+    else{
+      timer = setInterval(drawScene, 30);
+      $(this).text("Stop");
+    }
+  });
+
+  $("#rngSteps").on('input', function(){
+    steps = this.value;
+    $("#lblSteps").text(steps);
+  });
+
+  $("#rngRain").on('input', function(){
+    rain = Math.floor(Math.pow(2, this.value));
+    $("#lblRain").text(rain);
   });
 
   $("#lblLoading,.progress").remove();
@@ -259,7 +295,8 @@ var promises = [
   axios.get('shaders/elevation.fs.c'),
   axios.get('shaders/swe2.vs.c'),
   axios.get('shaders/swe2.fs.c'),
-  loadElevationFile(1000)
+  loadElevationFile(1000),
+  axios.get('orto-photo.png', {responseType: 'blob', timeout: 30000})
 ];
 
 Promise.all(promises).then(main);

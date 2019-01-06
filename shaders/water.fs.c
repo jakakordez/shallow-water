@@ -7,8 +7,6 @@ varying vec4 v_position;
 uniform sampler2D waterTexture;
 uniform sampler2D elevationTexture;
 
-
-
 void main() {
     vec4 c = texture2D(waterTexture, v_texcoord);
     float asl = texture2D(elevationTexture, v_texcoord).x;

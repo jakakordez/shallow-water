@@ -5,6 +5,7 @@ varying vec2 v_texcoord;
 varying vec4 v_position;
 
 uniform sampler2D elevationTexture;
+uniform sampler2D ortophotoTexture;
 
 float GradU(vec2 tc){
     int x = int(floor(tc.x*999.0));
@@ -37,7 +38,8 @@ float GradV(vec2 tc){
 void main() {
     //vec4 c = texture2D(waterTexture, v_texcoord);
     float asl = texture2D(elevationTexture, v_texcoord).x/2.0;
-    gl_FragColor = vec4(/*asl - floor(asl)*/abs(GradU(v_texcoord)), abs(GradV(v_texcoord)), 0, 1);
+    //gl_FragColor = vec4(/*asl - floor(asl)*/abs(GradU(v_texcoord)), abs(GradV(v_texcoord)), 0, 1);
+    gl_FragColor = texture2D(ortophotoTexture, vec2(v_texcoord.y, 1.0-v_texcoord.x));
     //gl_FragColor = vec4(0, 0, v_position.y, 1);
         
 }

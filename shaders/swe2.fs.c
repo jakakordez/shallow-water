@@ -6,6 +6,8 @@ varying vec2 v_texcoord;
 uniform sampler2D waterTexture;
 uniform sampler2D elevationTexture;
 
+uniform float rain;
+
 #define g   9.81
 
 #define h(Q)    (Q.x)
@@ -93,8 +95,8 @@ bool isnan( float val )
 void main() {
     vec2 tc = v_texcoord;
     vec4 Q = texture2D(waterTexture, tc);
-    //int x = int(floor(tc.x*128.0));
-    //int y = int(floor(tc.y*128.0));
+    int x = int(floor(tc.x*df));
+    int y = int(floor(tc.y*df));
     vec4 Qs = texture2D(waterTexture, tc+tds);
     vec4 Qn = texture2D(waterTexture, tc-tds);
     vec4 Qe = texture2D(waterTexture, tc+tde);
@@ -137,5 +139,8 @@ void main() {
     if(isnan(nQ.x) || nQ.x > 100.0) nQ.x = 0.0;
     if(isnan(nQ.y) || nQ.y > 100.0) nQ.y = 0.0;
     if(isnan(nQ.z) || nQ.z > 100.0) nQ.z = 0.0;
+    if(tc.x > 0.4 && tc.y > 0.4 && tc.x < 0.6 && tc.y < 0.6){
+        nQ.x += rain;
+    }
     gl_FragColor = nQ;
 }

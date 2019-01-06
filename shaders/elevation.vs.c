@@ -7,8 +7,6 @@ varying vec4 v_position;
 
 uniform sampler2D elevationTexture;
 
-
-
 void main() {
     v_texcoord = a_position.xz / 999.0;
 

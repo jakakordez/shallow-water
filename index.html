@@ -24,17 +24,29 @@
                 width: 100%;
                 height: auto;
             }
+            hr{
+                border-color:green;
+            }
+            input[type=range]{
+                width:100%;
+            }
         </style>
     </head>
     <body onresize="setSize()">
         <div class="container-fluid h-100">
             <div class="row h-100">
                 <div class="col-2">
-                    <h2>Shallow water</h2>
+                    <h2><a href="https://github.com/jakakordez/shallow-water/">Shallow water</a></h2>
                     <cite>Jaka Kordež</cite>
-                    <br />
+                    <br /><br />
                     <button type="button" id="btnStart" class="btn btn-success">Start</button>
-                    Draw time: <span id="lblDrawTime">-</span> ms
+                    <p>Draw time: <span id="lblDrawTime">-</span> ms</p>
+                    <hr />
+                    <p>Simulation steps: <span id="lblSteps">30</span></p>
+                    <input type="range" min="1" max="100" value="30" class="slider" id="rngSteps">
+                    <hr />
+                    <p>Rain intensity: <span id="lblRain">0</span> mm / frame</p>
+                    <input type="range" min="-1" max="10" value="0" class="slider" id="rngRain">
                 </div>
                 <div class="col-10">
                     <h1 id="lblLoading">Loading...</h1>
@@ -53,6 +65,7 @@
         <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
         <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
         <script src="js/framebuffer.js"></script>
+        <script src="js/ortophoto.js"></script>
         <script src="js/field.js"></script>
         <script src="js/elevation.js"></script>
         <script src="js/water.js"></script>
