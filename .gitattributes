@@ -1,0 +1,12 @@
+examples/he_moste.asc filter=lfs diff=lfs merge=lfs -text
+examples/soteska.png filter=lfs diff=lfs merge=lfs -text
+examples/sava.asc filter=lfs diff=lfs merge=lfs -text
+examples/sava.png filter=lfs diff=lfs merge=lfs -text
+examples/soteska.asc filter=lfs diff=lfs merge=lfs -text
+examples/he_moste.png filter=lfs diff=lfs merge=lfs -text
+examples/kranj.asc filter=lfs diff=lfs merge=lfs -text
+examples/kranj.png filter=lfs diff=lfs merge=lfs -text
+examples/ljubljana.asc filter=lfs diff=lfs merge=lfs -text
+examples/ljubljana.png filter=lfs diff=lfs merge=lfs -text
+examples/tacen.asc filter=lfs diff=lfs merge=lfs -text
+examples/tacen.png filter=lfs diff=lfs merge=lfs -text
