@@ -341,7 +341,7 @@ function loadExample(name){
     axios.get('shaders/swe2.vs.c'),
     axios.get('shaders/swe2.fs.c'),
     loadElevationFile(1000, filename+".asc"),
-    axios.get(filename+'.png', {responseType: 'blob', timeout: 30000})
+    axios.get(filename+'.png', {responseType: 'blob', timeout: 30000, crossdomain: true})
   ];
   
   Promise.all(promises).then(main);
