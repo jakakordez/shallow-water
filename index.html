@@ -30,6 +30,12 @@
             input[type=range]{
                 width:100%;
             }
+            #cntSidebar,#cntLoading{
+                display: none;
+            }
+            #cntFiles{
+                text-align: center;
+            }
         </style>
     </head>
     <body onresize="setSize()">
@@ -39,19 +45,32 @@
                     <h2><a href="https://github.com/jakakordez/shallow-water/">Shallow water</a></h2>
                     <cite>Jaka Kordež</cite>
                     <br /><br />
-                    <button type="button" id="btnStart" class="btn btn-success">Start</button>
-                    <p>Draw time: <span id="lblDrawTime">-</span> ms</p>
-                    <hr />
-                    <p>Simulation steps: <span id="lblSteps">30</span></p>
-                    <input type="range" min="1" max="100" value="30" class="slider" id="rngSteps">
-                    <hr />
-                    <p>Rain intensity: <span id="lblRain">0</span> mm / frame</p>
-                    <input type="range" min="-1" max="10" value="0" class="slider" id="rngRain">
+                    <div id='cntSidebar'>
+                        <button type="button" id="btnStart" class="btn btn-success">Start</button>
+                        <p>Draw time: <span id="lblDrawTime">-</span> ms</p>
+                        <hr />
+                        <p>Simulation steps: <span id="lblSteps">30</span></p>
+                        <input type="range" min="1" max="100" value="30" class="slider" id="rngSteps">
+                        <hr />
+                        <p>Rain intensity: <span id="lblRain">0</span> mm / frame</p>
+                        <input type="range" min="-1" max="10" value="0" class="slider" id="rngRain">
+                    </div>              
                 </div>
                 <div class="col-10">
-                    <h1 id="lblLoading">Loading...</h1>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                    <div class='container' id='cntFiles'>
+                        <h1>Select example</h1>
+                        <button class='btn btn-primary' onClick="loadExample('sava')">Sava</button>
+                        <button class='btn btn-primary' onClick="loadExample('he_moste')">HE Moste</button>
+                        <button class='btn btn-primary' onClick="loadExample('kranj')">Kranj</button>
+                        <button class='btn btn-primary' onClick="loadExample('ljubljana')">Ljubljana</button>
+                        <button class='btn btn-primary' onClick="loadExample('soteska')">Soteska Bohinj</button>
+                        <button class='btn btn-primary' onClick="loadExample('tacen')">Tacen</button>
+                    </div>
+                    <div class='container' id='cntLoading'>
+                        <h1 id="lblLoading">Loading...</h1>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                        </div>
                     </div>
                     <canvas id="glCanvas" width="300" height="300"></canvas>
                 </div>

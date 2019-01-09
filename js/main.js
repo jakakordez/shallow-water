@@ -266,8 +266,8 @@ function main(promises) {
     $("#lblRain").text(rain);
   });
 
-  $("#lblLoading,.progress").remove();
-
+  $("#cntLoading").remove();
+  $("#cntSidebar").show();
   
   document.onkeydown=function(e){
       e = e || window.event;
@@ -326,18 +326,22 @@ function setTexcoords(gl) {
       gl.STATIC_DRAW);
 }
 
-var promises = [
-  axios.get('shaders/water.vs.c'),
-  axios.get('shaders/water.fs.c'),
-  axios.get('shaders/elevation.vs.c'),
-  axios.get('shaders/elevation.fs.c'),
-  axios.get('shaders/swe2.vs.c'),
-  axios.get('shaders/swe2.fs.c'),
-  loadElevationFile(1000),
-  axios.get('orto-photo.png', {responseType: 'blob', timeout: 30000})
-];
-
-Promise.all(promises).then(main);
+function loadExample(name){
+  $("#cntFiles").remove();
+  $("#cntLoading").show();
+  var promises = [
+    axios.get('shaders/water.vs.c'),
+    axios.get('shaders/water.fs.c'),
+    axios.get('shaders/elevation.vs.c'),
+    axios.get('shaders/elevation.fs.c'),
+    axios.get('shaders/swe2.vs.c'),
+    axios.get('shaders/swe2.fs.c'),
+    loadElevationFile(1000, name),
+    axios.get('examples/'+name+'.png', {responseType: 'blob', timeout: 30000})
+  ];
+  
+  Promise.all(promises).then(main);
+}
 
 function setSize(){
   var canvas = document.getElementById("glCanvas");
