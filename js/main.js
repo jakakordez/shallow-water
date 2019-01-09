@@ -330,7 +330,7 @@ function loadExample(name){
   $("#cntFiles").remove();
   $("#cntLoading").show();
   var filename = 'examples/'+name;
-  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+  axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
   if(window.location.href.startsWith("https://jakakordez.github.io/shallow-water/")){
     filename = "https://github.com/jakakordez/shallow-water/raw/master/examples/"+name;
   }
