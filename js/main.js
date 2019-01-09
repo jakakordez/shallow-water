@@ -329,6 +329,10 @@ function setTexcoords(gl) {
 function loadExample(name){
   $("#cntFiles").remove();
   $("#cntLoading").show();
+  var filename = 'examples/'+name;
+  if(window.location.href.startsWith("https://jakakordez.github.io/shallow-water/")){
+    filename = "https://github.com/jakakordez/shallow-water/raw/master/examples/"+name;
+  }
   var promises = [
     axios.get('shaders/water.vs.c'),
     axios.get('shaders/water.fs.c'),
@@ -336,8 +340,8 @@ function loadExample(name){
     axios.get('shaders/elevation.fs.c'),
     axios.get('shaders/swe2.vs.c'),
     axios.get('shaders/swe2.fs.c'),
-    loadElevationFile(1000, name),
-    axios.get('examples/'+name+'.png', {responseType: 'blob', timeout: 30000})
+    loadElevationFile(1000, filename+".asc"),
+    axios.get(filename+'.png', {responseType: 'blob', timeout: 30000})
   ];
   
   Promise.all(promises).then(main);

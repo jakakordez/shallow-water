@@ -2,7 +2,7 @@
 function loadElevationFile(size, name){
     console.log("Started loading elevation");
     var promise = new Promise(function(resolve, reject) {
-        axios.get('examples/'+name+'.asc').then(function(d){
+        axios.get(name).then(function(d){
             var topography = new Float32Array(size * size * 4);
             var minx = 10000000;
             var miny = 10000000;
