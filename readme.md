@@ -9,7 +9,7 @@ This repository contains shallow water equations solver implemented in WebGL.
 
 ## To run
 
-Demonstration is available via Github Pages on [https://jakakordez.github.io/shallow-water/]()
+Demonstration is hosted on [http://kordez.si/shallow-water/]()
 
 ## Deploy locally
 

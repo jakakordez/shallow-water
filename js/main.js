@@ -45,6 +45,7 @@ function main(promises) {
   var sPositionLocation = gl.getAttribLocation(sweProgram, "a_position");
   var sWaterTexLocation = gl.getUniformLocation(sweProgram, "waterTexture");
   var sRainLocation = gl.getUniformLocation(sweProgram, "rain");
+  var sDtLocation = gl.getUniformLocation(sweProgram, "dt");
   var sElevationTexLocation = gl.getUniformLocation(sweProgram, "elevationTexture");
   
   // Create a buffer for positions
@@ -137,6 +138,7 @@ function main(promises) {
   }
 
   var steps = 30;
+  var dt = 0.001;
   var rain = 0;
   var pressed={};
   var position = [250, 600, 250];
@@ -196,6 +198,7 @@ function main(promises) {
         gl.uniform1f(sRainLocation, rain * 0.001);
       }
       else gl.uniform1f(sRainLocation, 0.0);
+      gl.uniform1f(sDtLocation, dt * 0.001);
 
       // Draw the geometry.
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -266,6 +269,11 @@ function main(promises) {
     $("#lblRain").text(rain);
   });
 
+  $("#rngDt").on('input', function(){
+    dt = Math.pow(2, this.value);
+    $("#lblDt").text(dt);
+  });
+
   $("#cntLoading").remove();
   $("#cntSidebar").show();
   
@@ -330,8 +338,8 @@ function loadExample(name){
   $("#cntFiles").remove();
   $("#cntLoading").show();
   var filename = 'examples/'+name;
-  axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
   if(window.location.href.startsWith("https://jakakordez.github.io/shallow-water/")){
+    axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
     filename = "https://github.com/jakakordez/shallow-water/raw/master/examples/"+name;
   }
   var promises = [

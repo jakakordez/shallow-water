@@ -50,10 +50,13 @@
                         <p>Draw time: <span id="lblDrawTime">-</span> ms</p>
                         <hr />
                         <p>Simulation steps: <span id="lblSteps">30</span></p>
-                        <input type="range" min="1" max="100" value="30" class="slider" id="rngSteps">
+                        <input type="range" min="0" max="100" value="30" class="slider" id="rngSteps">
                         <hr />
                         <p>Rain intensity: <span id="lblRain">0</span> mm / frame</p>
                         <input type="range" min="-1" max="10" value="0" class="slider" id="rngRain">
+                        <hr />
+                        <p>Time step: <span id="lblDt">1</span> ms</p>
+                        <input type="range" min="-2" max="5" value="0" class="slider" id="rngDt">
                     </div>              
                 </div>
                 <div class="col-10">

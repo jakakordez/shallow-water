@@ -7,6 +7,7 @@ uniform sampler2D waterTexture;
 uniform sampler2D elevationTexture;
 
 uniform float rain;
+uniform float dt;
 
 #define g   9.81
 
@@ -16,7 +17,6 @@ uniform float rain;
 
 #define df  999.0
 #define idf 1.0/df
-#define dt  0.001
 #define H   0.0
 
 #define tde vec2(idf, 0)
